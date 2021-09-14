@@ -13,13 +13,13 @@ stop() ->
 
 init(Port, N) ->
     case gen_tcp:listen(Port, [list, {active, false}, {reuseaddr, true}]) of
-			{ok, Listen} ->
-					handlers(Listen, N),
-					super();
-			{error, Error} ->
-					io:format("rudy: initialization failed: ~w~n", [Error]),
-					error
-				end.
+		{ok, Listen} ->
+			handlers(Listen, N),
+			super();
+		{error, Error} ->
+			io:format("rudy: initialization failed: ~w~n", [Error]),
+			error
+	end.
 
 super() ->
     receive
@@ -41,30 +41,30 @@ handlers(Listen, N) ->
 handler(Listen, I) ->
     %%io:format("rudy: waiting for request~n", []),
     case gen_tcp:accept(Listen) of
- 	{ok, Client} ->
-	    io:format("rudy ~w: received request~n", [I]),
-            request(Client),
-	    handler(Listen, I);
- 	{error, Error} ->
-	    io:format("rudy: error ~w~n", [Error]),
-	    error
+		{ok, Client} ->
+			io:format("rudy ~w: received request~n", [I]),
+			request(Client),
+			handler(Listen, I);
+		{error, Error} ->
+			io:format("rudy: error ~w~n", [Error]),
+			error
      end.
 
 request(Client) ->
     %%io:format("rudy: reading request from ~w~n", [Client]),
     Recv = gen_tcp:recv(Client, 0),
     case Recv of
-	{ok, Str} ->
-	    %%io:format("rudy: parsing request~n", []),
-	    Request = http:parse_request(Str),
-	    %%io:format("rudy: sending reply~n", []),
-	    Response = reply(Request),
-	    gen_tcp:send(Client, Response),
-	    %%io:format("rudy: closing socket ~w~n",[Client]),
-	    gen_tcp:close(Client);
-	{error, Error} ->
-   	    io:format("rudy: error: ~w~n", [Error]),
-	    ok
+		{ok, Str} ->
+			%%io:format("rudy: parsing request~n", []),
+			Request = http:parse_request(Str),
+			%%io:format("rudy: sending reply~n", []),
+			Response = reply(Request),
+			gen_tcp:send(Client, Response),
+			%%io:format("rudy: closing socket ~w~n",[Client]),
+			gen_tcp:close(Client);
+		{error, Error} ->
+			io:format("rudy: error: ~w~n", [Error]),
+			ok
     end.
 
     
