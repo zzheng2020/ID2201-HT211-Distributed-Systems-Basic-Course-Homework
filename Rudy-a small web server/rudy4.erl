@@ -13,13 +13,13 @@ stop() ->
 
 init(Port, N) ->
     case gen_tcp:listen(Port, [list, {active, false}, {reuseaddr, true}]) of
-	{ok, Listen} -> 
-	    handlers(Listen, N),
-	    super();
-	{error, Error} -> 
-	    io:format("rudy: initialization failed: ~w~n", [Error]),
-	    error
-    end.
+			{ok, Listen} ->
+					handlers(Listen, N),
+					super();
+			{error, Error} ->
+					io:format("rudy: initialization failed: ~w~n", [Error]),
+					error
+				end.
 
 super() ->
     receive

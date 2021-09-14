@@ -5,7 +5,7 @@ parse() ->
     http:parse_request("GET /foo HTTP/1.1\r\nUser-Agent: Test\r\nAccept: anything\r\n\r\nThis is the body").
 
 bench(Host, Port) ->
-    bench(Host, Port, 4, 10).
+    bench(Host, Port, 4, 100).
 
 bench(Host, Port, C, N) ->
     Start = now(),
