@@ -43,7 +43,7 @@ request(Host, Port) ->
         {ok, _} ->
             ok;
         {error, Error} ->
-%%            io:format("test: error: ~w~n", [Error]),
+            io:format("test: error: ~w~n", [Error]),
             error
     end,
     gen_tcp:close(Server).
