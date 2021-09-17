@@ -20,5 +20,13 @@
 1> lists:map(fun(X) -> [X, X] end, [1, 2, 3]).
 [[1,1],[2,2],[3,3]]
 
+%% lists:foldl(Fun, Acc0, List) -> Acc1
+%% example:
+1> lists:foldl(fun(X, Sum) -> Sum + X, 0, [1, 2, 3]).
+6
+
+
+
+[{Beilin, [London, Paris]}, {London, [Berlin, Beijing, Stockh]}]
 ```
 

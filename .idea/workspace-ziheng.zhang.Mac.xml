@@ -1,18 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c7cc448f-9600-4a30-b90d-d33759a64f6b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Routy-a small  routing network/routy.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Rudy-a small web server/test2.beam" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Rudy-a small web server/Figures.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Rudy-a small web server/Figures.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Rudy-a small web server/HW1-a small web server.md" beforeDir="false" afterPath="$PROJECT_DIR$/Rudy-a small web server/HW1-a small web server.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Rudy-a small web server/rudy.beam" beforeDir="false" afterPath="$PROJECT_DIR$/Rudy-a small web server/rudy.beam" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Rudy-a small web server/rudy.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/Rudy-a small web server/rudy.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Rudy-a small web server/rudy.svg" beforeDir="false" afterPath="$PROJECT_DIR$/Rudy-a small web server/rudy.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Rudy-a small web server/test.beam" beforeDir="false" afterPath="$PROJECT_DIR$/Rudy-a small web server/test.beam" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Rudy-a small web server/test.erl" beforeDir="false" afterPath="$PROJECT_DIR$/Rudy-a small web server/test.erl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Rudy-a small web server/test2.erl" beforeDir="false" afterPath="$PROJECT_DIR$/Rudy-a small web server/test2.erl" afterDir="false" />
-    </list>
+    <list default="true" id="c7cc448f-9600-4a30-b90d-d33759a64f6b" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -76,7 +65,7 @@
       </list>
     </option>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -97,16 +86,11 @@
       <workItem from="1631214352750" duration="680000" />
       <workItem from="1631224456228" duration="300000" />
       <workItem from="1631293880011" duration="5054000" />
-      <workItem from="1631393912490" duration="4400000" />
-      <workItem from="1631403089810" duration="84000" />
-      <workItem from="1631452542364" duration="5930000" />
-      <workItem from="1631523104273" duration="14563000" />
-      <workItem from="1631612698774" duration="606000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
+    <option name="version" value="1" />
   </component>
   <component name="Vcs.Log.History.Properties">
     <option name="COLUMN_ORDER">
@@ -135,14 +119,35 @@
                   </entry>
                 </map>
               </option>
+              <option name="COLUMN_ORDER" />
             </State>
           </value>
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="2560" y="-428" key="#Erlang" timestamp="1631205655960">
+      <screen x="1680" y="-798" width="2560" height="1415" />
+    </state>
+    <state x="2560" y="-428" key="#Erlang/0.25.1680.1025/1680.-798.2560.1415@1680.-798.2560.1415" timestamp="1631205655960" />
+    <state x="2469" y="-455" key="SettingsEditor" timestamp="1631205776300">
+      <screen x="1680" y="-798" width="2560" height="1415" />
+    </state>
+    <state x="2469" y="-455" key="SettingsEditor/0.25.1680.1025/1680.-798.2560.1415@1680.-798.2560.1415" timestamp="1631205776300" />
+    <state x="629" y="413" key="com.intellij.ide.util.TipDialog" timestamp="1631293881598">
+      <screen x="0" y="25" width="1680" height="1025" />
+    </state>
+    <state x="524" y="-879" key="com.intellij.ide.util.TipDialog/0.25.1440.875/-435.-1415.2560.1415@-435.-1415.2560.1415" timestamp="1631214353048" />
+    <state x="2639" y="-262" key="com.intellij.ide.util.TipDialog/0.25.1680.1025/1680.-798.2560.1415@1680.-798.2560.1415" timestamp="1631205497048" />
+    <state x="629" y="413" key="com.intellij.ide.util.TipDialog/0.25.1680.1025@0.25.1680.1025" timestamp="1631293881598" />
+    <state x="702" y="480" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1631298063829">
+      <screen x="0" y="25" width="1680" height="1025" />
+    </state>
+    <state x="634" y="-787" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.25.1440.875/-435.-1415.2560.1415@-435.-1415.2560.1415" timestamp="1631214376212" />
+    <state x="702" y="480" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.25.1680.1025@0.25.1680.1025" timestamp="1631298063829" />
   </component>
 </project>
