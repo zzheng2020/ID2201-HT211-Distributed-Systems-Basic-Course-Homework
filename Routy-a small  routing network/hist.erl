@@ -12,24 +12,23 @@
 %% API
 -export([new/1, update/3]).
 
-%% return a new history, where messages from Name will
-%% always be seen as old.
-new(Name) ->
-    Dict = dict:new(),
-    dict:append(Name, inf, Dict).
+% history:  keeps track of what messages that we have seen
+% for each messages should have a number
 
+% return a new history where messages from Name will
+% always be seen as old
+new(Node) ->
+    [{Node, inf}].
 
-update(Node, N, History) ->
-    case dict:find(Node, History) of
-        {ok, [Value | _ ]} ->
+update(Node, N, History)->
+    case lists:keyfind(Node, 1, History) of
+        {Node, MessageN} ->
             if
-                N > Value ->
-                    AuxDict = dict:erase(Node, History),
-                    Updated = dict:append(Node, N, AuxDict),
-                    {new, Updated};
+                N > MessageN ->
+                    {new, [{Node, N}|lists:keydelete(Node,1,History)]};
                 true ->
                     old
             end;
-        error ->
-            {new, dict:append(Node, N, History)}
+        false ->
+            {new, [{Node, N}|lists:keydelete(Node,1,History)]}
     end.
