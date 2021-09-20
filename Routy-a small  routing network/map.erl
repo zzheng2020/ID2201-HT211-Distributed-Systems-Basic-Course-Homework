@@ -28,5 +28,5 @@ reachable(Node, Map) ->
     end.
 
 all_nodes(Map) ->
-    All_Nodes = lists:foldl(fun({Node, Links}, Nodes) -> Nodes ++ Links ++ [Node] end, [], Map),
+    All_Nodes = lists:foldl(fun({City, To}, Nodes) -> Nodes ++ [City] ++ To end, [], Map),
     lists:usort(All_Nodes).
