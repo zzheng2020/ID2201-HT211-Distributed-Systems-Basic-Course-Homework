@@ -88,10 +88,10 @@ route(Node, Table) ->
 %% construct a routing table given the gateways
 %% and a map
 table(Gateways, Map) ->
-    io:format("Gateways: ~w~n", [Gateways]),
-    io:format("Map: ~w~n", [Map]),
+%%    io:format("Gateways: ~w~n", [Gateways]),
+%%    io:format("Map: ~w~n", [Map]),
     All_Nodes = map:all_nodes(Map),
-    io:format("All Nodes: ~w~n", [All_Nodes]),
+%%    io:format("All Nodes: ~w~n", [All_Nodes]),
     Dummy = lists:map(fun(Node) ->
             case lists:member(Node, Gateways) of
                 true ->
@@ -102,5 +102,5 @@ table(Gateways, Map) ->
                       end, All_Nodes),
 
     Sorted = lists:keysort(2, Dummy),
-    io:format("~w~n", [Sorted]),
+%%    io:format("~w~n", [Sorted]),
     iterate(Sorted, Map, []).
