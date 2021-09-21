@@ -12,15 +12,15 @@
 %% API
 -export([main/0, broadcast/0, update/0, stopAll/0]).
 
-% erl -name sweden@192.168.3.12 -setcookie routy -connect_all false
+% erl -name ziheng@zhang -setcookie routy -connect_all false
 
 main() ->
-    routy:start(r1, stockholm),
-    routy:start(r2, lund),
-    routy:start(r3, goteborg),
-    r1 ! {add, lund, {r2, 'sweden@192.168.3.12'}},
-    r2 ! {add, goteborg, {r3, 'sweden@192.168.3.12'}},
-    r3 ! {add, stockholm, {r1, 'sweden@192.168.3.12'}},
+    routy:start(r1, test1),
+    routy:start(r2, test2),
+    routy:start(r3, test3),
+    r1 ! {add, test2, {r2, 'ziheng@zhang'}},
+    r2 ! {add, test3, {r3, 'ziheng@zhang'}},
+    r3 ! {add, test1, {r1, 'ziheng@zhang'}},
     true.
 
 broadcast() ->

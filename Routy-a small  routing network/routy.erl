@@ -25,17 +25,14 @@ status(Router) ->
     Router ! {status, self()},
     receive
         {status, {Name, N, Msg, Intf, Table, Map}}->
-            io:format("Status -------------~n"),
-            io:format(" name: ~w~n", [Name]),
-            io:format("    n: ~w~n", [N]),
-            io:format(" msgs: ~w~n", [Msg]),
-            io:format(" intf: ~w~n", [Intf]),
+            io:format("Status is shown below:~n"),
+            io:format("name: ~w~n", [Name]),
+            io:format("n: ~w~n", [N]),
+            io:format("msgs: ~w~n", [Msg]),
+            io:format("intf: ~w~n", [Intf]),
             io:format("table: ~w~n", [Table]),
-            io:format("  map: ~w~n", [Map]),
+            io:format("map: ~w~n", [Map]),
             ok
-    after 4000 ->
-        io:format("No reply -------------~n"),
-        ok
     end.
 
 
