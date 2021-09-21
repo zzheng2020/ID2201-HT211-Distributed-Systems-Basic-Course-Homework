@@ -21,21 +21,6 @@ stop(Node) ->
     Node ! stop,
     unregister(Node).
 
-status(Router) ->
-    Router ! {status, self()},
-    receive
-        {status, {Name, N, Msg, Intf, Table, Map}}->
-            io:format("Status is shown below:~n"),
-            io:format("name: ~w~n", [Name]),
-            io:format("n: ~w~n", [N]),
-            io:format("msgs: ~w~n", [Msg]),
-            io:format("intf: ~w~n", [Intf]),
-            io:format("table: ~w~n", [Table]),
-            io:format("map: ~w~n", [Map]),
-            ok
-    end.
-
-
 init(Name) ->
     Intf = interfaces:new(),
     Map = map:new(),
@@ -139,5 +124,19 @@ router(Name, N, Hist, Intf, Table, Map) ->
             router(Name, N+1, Hist, Intf, Table, Map);
 
         stop ->
+            ok
+    end.
+
+status(Router) ->
+    Router ! {status, self()},
+    receive
+        {status, {Name, N, Msg, Intf, Table, Map}}->
+            io:format("Status is shown below:~n"),
+            io:format("name: ~w~n", [Name]),
+            io:format("n: ~w~n", [N]),
+            io:format("msgs: ~w~n", [Msg]),
+            io:format("intf: ~w~n", [Intf]),
+            io:format("table: ~w~n", [Table]),
+            io:format("map: ~w~n", [Map]),
             ok
     end.
