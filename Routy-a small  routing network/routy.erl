@@ -41,13 +41,17 @@ router(Name, N, Hist, Intf, Table, Map) ->
             router(Name, N, Hist, Intf1, Table, Map);
 
         {remove, Node} ->
+%%            {ok, Ref} = interfaces:ref(Node, Intf),
+%%            erlang:demonitor(Ref),
+%%            Intf1 = interfaces:remove(Node, Intf),
+%%            router(Name, N, Hist, Intf1, Table, Map);
             case interfaces:ref(Node, Intf) of
                 {ok, Ref} ->
                     erlang:demonitor(Ref),
                     Intf1 = interfaces:remove(Node, Intf),
                     router(Name, N, Hist, Intf1, Table, Map);
                 notfound ->
-                    io:format("Remove unknown node!")
+                    io:format("Error! You are trying to remove an unexisted node!")
             end,
             router(Name, N, Hist, Intf, Table, Map);
 

@@ -26,7 +26,7 @@ remove(Name, Intf) ->
     lists:keydelete(Name, 1, Intf).
 
 
-% find the interferce Pid with name
+% find the interface Pid with name
 lookup(Name, Intf) ->
     case lists:keyfind(Name, 1, Intf) of
         {Name, _, Pid} -> {ok, Pid};

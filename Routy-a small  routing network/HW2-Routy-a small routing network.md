@@ -29,6 +29,16 @@
 
 [{Beilin, [London, Paris]}, {London, [Berlin, Beijing, Stockh]}]
 
+%%            case interfaces:ref(Node, Intf) of
+%%                {ok, Ref} ->
+%%                    erlang:demonitor(Ref),
+%%                    Intf1 = interfaces:remove(Node, Intf),
+%%                    router(Name, N, Hist, Intf1, Table, Map);
+%%                notfound ->
+%%                    io:format("Remove unknown node!")
+%%            end,
+%%            router(Name, N, Hist, Intf, Table, Map);
+
 ---------------------------------- Test ---------------------------------------------
 
 erl -name ziheng@zhang -setcookie routy -connect_all false
