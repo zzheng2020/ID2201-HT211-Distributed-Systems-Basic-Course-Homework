@@ -18,16 +18,33 @@ start(Nodes) ->
 stop(Logger) ->
     Logger ! stop.
 
-init(_) ->
-    loop().
+init(Nodes) ->
+    Clock = time:clock(Nodes),
+    loop(Clock, []).
 
-loop() ->
+loop(Clock, HoldBackQueue) ->
     receive
         {log, From, Time, Msg} ->
-            log(From, Time, Msg),
-            loop();
+            MessageQueue = lists:keysort(3, MessageList = HoldBackQueue ++ [{log, From, Time, Msg}]),
+            List = time:update(From, Time, Clock),
+            case time:safe(Time, List) of
+                true ->
+                    TempList = logInfo(Time, MessageQueue),
+                    loop(List, TempList);
+                false ->
+                    loop(List, MessageList)
+            end;
         stop ->
             ok
+    end.
+
+logInfo(_, [])->
+    [];
+logInfo(Time, [{log, From, MsgTime, Msg}|T]) ->
+    if
+        MsgTime =< Time -> log(From, MsgTime, Msg),
+            logInfo(Time, T);
+        true -> [{log, From, MsgTime, Msg}|T]
     end.
 
 log(From, Time, Msg) ->
