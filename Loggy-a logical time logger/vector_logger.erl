@@ -46,15 +46,31 @@ queue_push_back([H | T], Request, Flag) ->
 loop(Clock, HoldBackQueue) ->
     receive
         {log, From, Time, Msg} ->
-            MessageList = queue_push_back(HoldBackQueue, {log, From, Time, Msg}, false),
-
             List = vector_time:update(From, Time, Clock),
-            case vector_time:safe(Time, List) of
-                true ->
-                    TempList = logInfo(Time, MessageList),
-                    loop(List, TempList);
-                false ->
-                    loop(List, MessageList)
+
+            MessageList = queue_push_back(HoldBackQueue, {log, From, Time, Msg}, false),
+%%            io:format("============vector_logger==============~n"),
+%%            io:format("~p~n", [From]),
+%%            List = vector_time:update(From, Time, Clock),
+%%            MessageList = [{log, From, Time, Msg} | HoldBackQueue],
+%%            MessageList = [{log, From, Time, Msg} | HoldBackQueue],
+%%            io:format("~p~n", [MessageList]),
+%%            io:format("============vector_logger==============~n"),
+%%            io:format("~p~n", [List]),
+
+            Length = list_length(MessageList),
+%%            io:format("~w~n", [Length]),
+            if Length > 1 ->
+                case vector_time:safe(Time, List) of
+                    true ->
+%%                        io:format("Time: ~p~n", [Time]),
+    %%                    io:format("List: ~p~n", [List]),
+                        TempList = logInfo(Time, MessageList),
+                        loop(List, TempList);
+                    false ->
+                        loop(List, MessageList)
+                end;
+                true -> loop(List, MessageList)
             end;
     % log(From, Time, Msg),
     % loop();
@@ -63,14 +79,24 @@ loop(Clock, HoldBackQueue) ->
     end.
 
 log(From, Time, Msg) ->
-    io:format("log: ~w~w~p~n", [Time, From, Msg]).
+    io:format("log: ~w~p~w~n", [From, Msg, Time]).
 
 
 logInfo(_, [])->
     [];
 logInfo(Time, [{log, From, MsgTime, Msg} | T]) ->
+    Compare = vector_time:leq2(MsgTime, Time),
+%%    io:format("MsgTime: ~p~n", [MsgTime]),
+%%    io:format("Time: ~p~n", [Time]),
     if
-        MsgTime =< Time -> log(From, MsgTime, Msg),
+        Compare == true ->
+            log(From, MsgTime, Msg),
+%%            MsgTime =< Time -> log(From, MsgTime, Msg),
             logInfo(Time, T);
         true -> [{log, From, MsgTime, Msg} | T]
     end.
+
+list_length([]) ->
+    0;
+list_length([H | T]) ->
+    1 + list_length(T).

@@ -36,9 +36,13 @@ loop(Index, Name, Log, Peers, Sleep, Jitter, MsgClock) ->
     Wait = random:uniform(Sleep),
     receive
         {msg, TimeVector, Msg} ->
+%%            io:format("=============vector_worker===========~n"),
+%%            io:format("Name: ~p~n", [Name]),
+%%            io:format("Time: ~p~n", [TimeVector]),
+%%            io:format("=============vector_worker==~n"),
             TempVector = vector_time:merge(TimeVector, MsgClock),
             NewVector = vector_time:inc(Index, TempVector, 1),
-
+%%            jitter(Jitter),
             Log ! {log, Name, NewVector, {received, Msg}},
             loop(Index, Name, Log, Peers, Sleep, Jitter, NewVector);
         stop ->
