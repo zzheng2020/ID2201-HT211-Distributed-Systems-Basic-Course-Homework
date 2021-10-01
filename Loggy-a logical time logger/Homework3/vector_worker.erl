@@ -12,7 +12,7 @@
 %% API
 -export([start/7, stop/1, peers/2]).
 
-
+% should know how many processes there are
 start(Index, Name, Logger, Seed, Sleep, Jitter, N) ->
     spawn_link(fun()->init(Index, Name, Logger, Seed, Sleep, Jitter, N) end).
 
