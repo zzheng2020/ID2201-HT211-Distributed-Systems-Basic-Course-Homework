@@ -6,7 +6,7 @@
 -define(color, {0,0,0}).
 
 % Start a worker given:
-%  Id - a unique interger, only used for debugging
+%  Id - a unique integer, only used for debugging
 %  Module - the module we want to use, i.e. gms1
 %  Rnd - a value to seed the random generator
 %  Sleep  - for how long should we sleep between proposing state changes
@@ -14,9 +14,12 @@
 start(Id, Module, Rnd, Sleep) ->
     spawn(fun() -> init(Id, Module, Rnd, Sleep) end).
 
+%% Id = N
 init(Id,  Module, Rnd, Sleep) ->
     {ok, Cast} = apply(Module, start, [Id]),
+%%	io:format("Cast: ~p~n", [Cast]),
     Color = ?color,
+	%% Cast is the PID of process which is made by apply function in the "Module".
     init_cont(Id, Rnd, Cast, Color, Sleep).
 
 % Same as above, but now we join an existing worker
@@ -121,8 +124,9 @@ worker(Id, Cast, Color, Gui, Sleep) ->
 
     after Wait ->
 	    %% Ok, let's propose a change of colors
-	    %% io:format("worker ~w mcast message~n", [Id]),
+	     io:format("worker ~w mcast message~n", [Id]),
 	    Cast !  {mcast, {change, random:uniform(?change)}},
+%%		io:format("Cast: ~p ", [Cast]),
 	    worker(Id, Cast, Color, Gui, Sleep)	    
     end.
 

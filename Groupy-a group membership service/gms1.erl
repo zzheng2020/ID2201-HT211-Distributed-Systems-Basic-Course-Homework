@@ -18,10 +18,14 @@
 %% group : a list of all application layer processes in the group.
 
 
+%% Id = N
 start(Id) ->
+    %% Self is the PID of this process.
     Self = self(),
+%%    io:format("Self: ~p, ", [Self]),
     {ok, spawn_link(fun()-> init(Id, Self) end)}.
 
+%% Master = PID
 init(Id, Master) ->
     leader(Id, Master, [], [Master]).
 
@@ -38,10 +42,13 @@ init(Id, Grp, Master) ->
             slave(Id, Master, Leader, Slaves, Group)
     end.
 
+
+%% At the begin, Master = PID, Slaves = [], Group = [Master]
 leader(Id, Master, Slaves, Group) ->
     receive
         {mcast, Msg} ->
             bcast(Id, {msg, Msg}, Slaves),
+            io:format("Master: ~p, ", [Master]),
             Master ! Msg,
             leader(Id, Master, Slaves, Group);
         {join, Wrk, Peer} ->
@@ -54,6 +61,7 @@ leader(Id, Master, Slaves, Group) ->
     end.
 
 slave(Id, Master, Leader, Slaves, Group) ->
+%%    io:format("Leader, ~p, ", [Leader]),
     receive
         {mcast, Msg} ->
             Leader ! {mcast, Msg},
@@ -68,3 +76,6 @@ slave(Id, Master, Leader, Slaves, Group) ->
             Master ! {view, Group2},
             slave(Id, Master, Leader, Slaves2, Group2);
         stop -> ok end.
+
+bcast(_Id, Msg, Nodes) ->
+    lists:foreach(fun(Node) -> Node ! Msg end, Nodes).
