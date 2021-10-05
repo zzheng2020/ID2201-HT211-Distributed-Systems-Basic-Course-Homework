@@ -48,7 +48,7 @@ leader(Id, Master, Slaves, Group) ->
     receive
         {mcast, Msg} ->
             bcast(Id, {msg, Msg}, Slaves),
-            io:format("Master: ~p, ", [Master]),
+%%            io:format("Master: ~p, ", [Master]),
             Master ! Msg,
             leader(Id, Master, Slaves, Group);
         {join, Wrk, Peer} ->

@@ -27,9 +27,9 @@ init(Id, Rnd,Master) ->
 start(Id, Grp) ->
     Rnd = random:uniform(1000),
     Self = self(),
-    {ok, spawn_link(fun()-> init(Id, Rnd,Grp, Self) end)}.
+    {ok, spawn_link(fun()-> init(Id, Rnd, Grp, Self) end)}.
 
-init(Id,Rnd, Grp, Master) ->
+init(Id, Rnd, Grp, Master) ->
     random:seed(Rnd, Rnd, Rnd),
     Self = self(),
     Grp ! {join, Master, Self},
@@ -62,24 +62,35 @@ slave(Id, Master, Leader, Slaves, Group) ->
             ok
     end.
 
+election(Id, Master, Slaves, [_|Group]) ->
+    Self = self(),
+    case Slaves of
+        [Self|Rest] ->
+            b_cast(Id, {view, Slaves, Group}, Rest),
+            Master ! {view, Group},
+            leader(Id, Master, Rest, Group);
+        [Leader|Rest] ->
+            erlang:monitor(process, Leader),
+            slave(Id, Master, Leader, Rest, Group)
+    end.
 
 leader(Id, Master, Slaves, Group) ->
     receive
         {mcast, Msg} ->
-            bcast(Id, {msg, Msg}, Slaves),
+            b_cast(Id, {msg, Msg}, Slaves),
             Master ! Msg,
             leader(Id, Master, Slaves, Group);
         {join, Wrk, Peer} ->
             Slaves2 = lists:append(Slaves, [Peer]),
             Group2 = lists:append(Group, [Wrk]),
-            bcast(Id, {view, [self()|Slaves2], Group2}, Slaves2),
+            b_cast(Id, {view, [self()|Slaves2], Group2}, Slaves2),
             Master ! {view, Group2},
             leader(Id, Master, Slaves2, Group2);
         stop ->
             ok
     end.
 
-bcast(Id, Msg, Nodes) ->
+b_cast(Id, Msg, Nodes) ->
     lists:foreach(fun(Node) -> Node ! Msg, crash(Id) end, Nodes).
 
 crash(Id) ->
@@ -89,16 +100,4 @@ crash(Id) ->
             exit(no_luck);
         _ ->
             ok
-    end.
-
-election(Id, Master, Slaves, [_|Group]) ->
-    Self = self(),
-    case Slaves of
-        [Self|Rest] ->
-            bcast(Id, {view, Slaves, Group}, Rest),
-            Master ! {view, Group},
-            leader(Id, Master, Rest, Group);
-        [Leader|Rest] ->
-            erlang:monitor(process, Leader),
-            slave(Id, Master, Leader, Rest, Group)
     end.
