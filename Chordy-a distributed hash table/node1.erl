@@ -10,9 +10,36 @@
 -author("zhangziheng").
 
 %% API
--export([]).
+-export([start/1, start/2, node/3]).
 -define(Stabilize, 1000).
 -define(Timeout, 1000).
+
+%% first node
+start(Id) ->
+    start(Id, nil).
+
+%% add node to an existing ring
+start(Id, Peer) ->
+    timer:start(),
+    spawn(fun() -> init(Id, Peer) end).
+
+init(Id, Peer) ->
+    Predecessor = nil,
+    {ok, Successor} = connect(Id, Peer),
+    schedule_stabilize(),
+    node(Id, Predecessor, Successor).
+
+connect(Id, nil) ->
+    {ok, {Id, self()}};
+connect(_Id, Peer) ->
+    Qref = make_ref(),
+    Peer ! {key, Qref, self()},
+    receive
+        {Qref, Skey} ->
+            {ok, {Skey, Peer}}
+        after ?Timeout ->
+            io:format("Time out: no response~n", [])
+    end.
 
 %% key, predecessor, successor
 
@@ -37,6 +64,18 @@ node(Id, Predecessor, Successor) ->
         {status, Pred} ->
             Succ = stabilize(Pred, Id, Successor),
             node(Id, Predecessor, Succ);
+
+        probe ->
+            create_probe(Id, Successor),
+            node(Id, Predecessor, Successor);
+
+        {probe, Id, Nodes, T} ->
+            remove_probe(T, Nodes),
+            node(Id, Predecessor, Successor);
+
+        {probe, Ref, Nodes, T} ->
+            forward_probe(Ref, T, Nodes, Id, Successor),
+            node(Id, Predecessor, Successor);
 
         %% When a new node is added, we need to stabilize.
         stabilize ->
@@ -68,7 +107,7 @@ stabilize(Pred, Id, Successor) ->
 
         %% If the predecessor of node Id's successor points to itself,
         %% then notify Id's successor.
-        {SKey, _} ->
+        {Skey, _} ->
             Spid ! {notify, {Id, self()}},
             Successor;
 
@@ -123,3 +162,18 @@ notify({Nkey, Npid}, Id, Predecessor) ->
                     Predecessor
             end
     end.
+
+create_probe(Id, Successor) ->
+    {_,Pid} = Successor,
+    CurrentT = erlang:now(),
+    Pid ! {probe, Id, [Id], CurrentT}.
+
+remove_probe(T, Nodes) ->
+
+    ArrivedT = erlang:now(),
+    Diff = timer:now_diff(ArrivedT, T),
+    io:format("The nodes are ~w.~n The time to pass around the ring is ~w.~n",[Nodes,Diff]).
+
+forward_probe(Ref, T, Nodes, Id, Successor) ->
+    {_, Pid} = Successor,
+    Pid ! {probe, Ref, [Id | Nodes], T}.
