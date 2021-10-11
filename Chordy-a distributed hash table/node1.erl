@@ -11,6 +11,8 @@
 
 %% API
 -export([]).
+-define(Stabilize, 1000).
+-define(Timeout, 1000).
 
 %% key, predecessor, successor
 
@@ -35,7 +37,16 @@ node(Id, Predecessor, Successor) ->
         {status, Pred} ->
             Succ = stabilize(Pred, Id, Successor),
             node(Id, Predecessor, Succ);
+
+        %% When a new node is added, we need to stabilize.
+        stabilize ->
+            stabilize(Successor),
+            node(Id, Predecessor, Successor)
     end.
+
+%% send a request message to its successor.
+stabilize({_, Spid}) ->
+    Spid ! {request, self()}.
 
 %% Pred: ours successors current predecessor.
 stabilize(Pred, Id, Successor) ->
@@ -83,4 +94,32 @@ stabilize(Pred, Id, Successor) ->
                     Successor
             end
 
+    end.
+
+%% The stabilize procedure must be done with regular intervals.
+schedule_stabilize() ->
+    timer:send_interval(?Stabilize, self(), stabilize).
+
+request(Peer, Predecessor) ->
+    case Predecessor of
+        nil ->
+            Peer ! {status, nil};
+        {Pkey, Ppid} ->
+            Peer ! {status, {Pkey, Ppid}}
+    end.
+
+notify({Nkey, Npid}, Id, Predecessor) ->
+    case Predecessor of
+        nil ->
+            Npid ! {status, {Nkey, Npid}},
+            {Nkey, Npid};
+        {Pkey, _} ->
+            case key:between(Nkey, Pkey, Id) of
+                true ->
+                    Npid ! {status, {Nkey, Npid}},
+                    {Nkey, Npid};
+                false ->
+                    Npid ! {status, Predecessor},
+                    Predecessor
+            end
     end.
