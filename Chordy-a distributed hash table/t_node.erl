@@ -1,17 +1,7 @@
-%%%-------------------------------------------------------------------
-%%% @author zhangziheng
-%%% @copyright (C) 2021, <COMPANY>
-%%% @doc
-%%%
-%%% @end
-%%% Created : 11. 10月 2021 下午6:02
-%%%-------------------------------------------------------------------
--module(t_node).
--author("zhangziheng").
-
-%% API
--export([node/3,start/1,start/2]).
--define(Stabilize,1000).
+%a local storage
+-module(node2).
+-export([node/4,start/1,start/2]).
+-define(Stabilize,500).
 -define(Timeout,1000).
 
 %we are the first node
@@ -29,7 +19,8 @@ init(Id,Peer)->
     Predecessor = nil,
     {ok,Successor} = connect(Id,Peer),
     schedule_stabilize(),
-    node(Id,Predecessor,Successor).
+    S = storage:create(),
+    node(Id,Predecessor,Successor,S).
 
 %myself is the successor
 connect(Id,nil)->
@@ -50,42 +41,55 @@ connect(_Id,Peer)->
 
 
 %node function for listening
-node(Id, Predecessor,Successor)->
+node(Id, Predecessor,Successor,Store)->
     receive
     %a peer needs to know the key
         {key, Qref, Peer}->
             Peer ! {Qref, Id},
-            node(Id, Predecessor, Successor);
+            node(Id, Predecessor, Successor,Store);
     %a new node informs us the existence
         {notify, New}->
-            Pred = notify(New, Id, Predecessor),
-            node(Id, Pred, Successor);
+            {Pred,S} = notify(New, Id, Predecessor,Store),
+            node(Id, Pred, Successor,S);
     %a predecessor needs to know our predecessor
         {request, Peer}->
             request(Peer,Predecessor),
-            node(Id,Predecessor,Successor);
+            node(Id,Predecessor,Successor,Store);
     %our successor informs us about its predecessor
         {status,Pred}->
             Succ = stabilize(Pred, Id, Successor),
-            node(Id, Predecessor,Succ);
+            node(Id, Predecessor,Succ,Store);
     %create a probe
         probe->
             create_probe(Id,Successor),
-            node(Id,Predecessor,Successor);
+            node(Id,Predecessor,Successor,Store);
     %we know that we send the probe since Id is equal
         {probe,Id,Nodes,T}->
             remove_probe(T,Nodes),
-            node(Id,Predecessor,Successor);
+            node(Id,Predecessor,Successor,Store);
     %pass the probe to next node
         {probe,Ref,Nodes,T}->
             forward_probe(Ref,T,Nodes,Id,Successor),
-            node(Id,Predecessor,Successor);
+            node(Id,Predecessor,Successor,Store);
+    %add a key value pair
+        {add,Key,Value,Qref,Client}->
+            Added = add(Key,Value,Qref,Client,Id,Predecessor,Successor,Store),
+            node(Id,Predecessor,Successor,Added);
+    %lookup for key value pair
+        {lookup,Key,Qref,Client}->
+            lookup(Key,Qref,Client,Id,Predecessor,Successor,Store),
+            node(Id,Predecessor,Successor,Store);
+    %new nodes want to join
+    %update the storage
+        {handover,Elements}->
+            Merged = storage:merge(Store,Elements),
+            node(Id,Predecessor,Successor,Merged);
 
     %to stabilize
     %use when a new node is added
         stabilize->
             stabilize(Successor),
-            node(Id,Predecessor,Successor)
+            node(Id,Predecessor,Successor,Store)
     end.
 
 %send a request message to myself
@@ -116,11 +120,10 @@ stabilize(Pred, Id, Successor)->
         {Xkey,Xpid}->
             case key:between(Xkey,Id,Skey) of
                 %we are before the predecessor of the target node
-                %adopt the successor and run this function again
+                %?
                 true->
                     self() ! stabilize,
                     Xpid ! {request, self()},
-                    %stabilize(Pred, Id, {Xkey,Xpid}),
                     {Xkey,Xpid};
                 %we are the predecessor of the target node than its original predecessor
                 false->
@@ -147,21 +150,32 @@ request(Peer,Predecessor)->
 
 %get the information of a possible new predecessor
 %need to check by myself
-notify({Nkey,Npid},Id,Predecessor)->
+notify({Nkey,Npid},Id,Predecessor,Store)->
     case Predecessor of
         nil->
-            Npid!{status, {Nkey,Npid}},
-            {Nkey,Npid};
+            %update the storage
+            Keep = handover(Id,Store,Nkey,Npid),
+            {{Nkey,Npid},Keep};
         {Pkey,_}->
             case key:between(Nkey,Pkey,Id) of
                 true->
-                    Npid!{status, {Nkey,Npid}},
-                    {Nkey,Npid};
+                    %update the storage
+                    Keep = handover(Id,Store,Nkey,Npid),
+                    {{Nkey,Npid},Keep};
+                %new node is before the predecessor
                 false->
-                    Npid!{status, Predecessor},
-                    Predecessor
+                    %Npid!{status, Predecessor},
+                    {Predecessor,Store}
             end
     end.
+
+%split the storage
+%one part is kept, another part is passed to the new node
+handover(Id, Store, Nkey, Npid) ->
+    {Keep, Rest} = storage:split(Id, Nkey, Store),
+    Npid ! {handover, Rest},
+    Keep.
+
 
 %create a probe with time stamp
 create_probe(Id,Successor)->
@@ -182,3 +196,29 @@ remove_probe(T,Nodes)->
 forward_probe(Ref,T,Nodes,Id,Successor)->
     {_,Pid} = Successor,
     Pid!{probe,Ref,[Id|Nodes],T}.
+
+%check if we should take care of the key (predecessor, us]
+%if we should, then add the new key value
+%if we should not, give the key to our successor
+add(Key,Value,Qref,Client,Id,{Pkey,_},{_,Spid},Store)->
+    case key:between(Key,Pkey,Id) of
+        true->
+            Client!{Qref,ok},
+            storage:add(Key,Value,Store);
+        false->
+            Spid!{add,Key,Value,Qref,Client},
+            Store
+    end.
+
+%check if we are responsible for the key
+%if so, we lookup in the store and send the reply
+%if not, we forward the request
+lookup(Key,Qref,Client,Id,{Pkey,_},Successor,Store)->
+    case key:between(Key,Pkey,Id) of
+        true->
+            Result = storage:lookup(Key,Store),
+            Client!{Qref,Result};
+        false->
+            {_,Spid} = Successor,
+            Spid!{lookup, Key,Qref,Client}
+    end.

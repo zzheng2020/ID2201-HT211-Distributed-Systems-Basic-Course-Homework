@@ -14,7 +14,7 @@ start(Module) ->
 
 start(Module, P) ->
     Id = key:generate(), 
-    apply(Module, start, [Id,P]).    
+    apply(Module, start, [Id,P]).
 
 start(_, 0, _) ->
     ok;
@@ -24,24 +24,24 @@ start(Module, N, P) ->
 
 %% The functions add and lookup can be used to test if a DHT works.
 
-add(Key, Value , P) ->
+add(Key, Value, P) ->
     Q = make_ref(),
     P ! {add, Key, Value, Q, self()},
     receive 
-	{Q, ok} ->
-	   ok
-	after ?Timeout ->
-	    {error, "timeout"}
+        {Q, ok} ->
+           ok
+        after ?Timeout ->
+            {error, "timeout"}
     end.
 
 lookup(Key, Node) ->
     Q = make_ref(),
     Node ! {lookup, Key, Q, self()},
     receive 
-	{Q, Value} ->
-	    Value
-    after ?Timeout ->
-	    {error, "timeout"}
+        {Q, Value} ->
+            Value
+        after ?Timeout ->
+            {error, "timeout"}
     end.
 
 
