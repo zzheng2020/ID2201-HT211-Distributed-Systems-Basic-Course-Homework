@@ -26,7 +26,6 @@ start(Id, Peer) ->
 init(Id, Peer) ->
     Predecessor = nil,
     {ok, Successor} = connect(Id, Peer),
-%%    io:format("Succ: ~p~n", [Successor]),
     schedule_stabilize(),
     Store = storage:create(),
     node(Id, Predecessor, Successor, nil, Store).
@@ -101,7 +100,6 @@ node(Id, Predecessor, Successor, Next, Store) ->
             node(Id, Predecessor, Successor, Next, Merged);
 
         {'DOWN', Ref, process, _, _} ->
-%%            io:format("Ref: ~p~n", [Ref]),
             {Pred, Succ, Nxt} = down(Ref, Predecessor, Successor, Next),
             node(Id, Pred, Succ, Nxt, Store)
     end.
@@ -156,13 +154,15 @@ stabilize(Pred, Next, Id, Successor) ->
                 true ->
                     Xpid ! {notify, {Id, self()}},
                     drop(Sref),
-                    %% monitor the predecessor as the successor
+
+
+                    %monitor the predecessor as the successor
                     XNref = monitor(Xpid),
-                    %% Xpid ! {request, self()},
+                    %Xpid ! {request, self()},
                     self() ! stabilize,
-                    %% stabilize(Pred, Next, Id, {Xkey,Xref,Xpid}),
-                    %% predecessor is the successor
-                    %% successor is the next
+                    %stabilize(Pred, Next, Id, {Xkey,Xref,Xpid}),
+                    %predecessor is the successor
+                    %successor is the next
                     {{Xkey, XNref, Xpid},Successor};
 
                 %% If X_node is not between Id and Skey,
