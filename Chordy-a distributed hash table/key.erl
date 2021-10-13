@@ -13,7 +13,7 @@
 -export([generate/0, between/3]).
 
 generate() ->
-    rand:uniform(1000000).
+    rand:uniform(10000).
 
 %% e.g.
 %% 8 nodes form a circle

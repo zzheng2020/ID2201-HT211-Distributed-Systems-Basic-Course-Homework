@@ -8,12 +8,14 @@
 %% Starting up a set of nodes is made easier using this function.
 
 start(Module) ->
-    Id = key:generate(), 
+    Id = key:generate(),
+    io:format("Id: ~p~n", [Id]),
     apply(Module, start, [Id]).
 
 
 start(Module, P) ->
-    Id = key:generate(), 
+    Id = key:generate(),
+    io:format("Id: ~p~n", [Id]),
     apply(Module, start, [Id,P]).
 
 start(_, 0, _) ->

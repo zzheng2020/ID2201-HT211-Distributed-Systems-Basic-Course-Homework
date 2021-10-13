@@ -45,6 +45,7 @@ connect(_Id, Peer) ->
 %% key, predecessor, successor
 
 node(Id, Predecessor, Successor) ->
+%%    io:format("Id: ~p, Pre: ~p, Suc: ~p~n", [Id, Predecessor, Successor]),
     receive
     %% a peer needs to know our key
         {key, Qref, Peer} ->
@@ -86,6 +87,7 @@ node(Id, Predecessor, Successor) ->
 
 %% send a request message to its successor.
 stabilize({_, Spid}) ->
+%%    io:format("test"),
     Spid ! {request, self()}.
 
 %% Pred: ours successors current predecessor.
