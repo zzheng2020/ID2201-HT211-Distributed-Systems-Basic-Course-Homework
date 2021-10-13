@@ -111,7 +111,7 @@ down(Ref, {_, Ref, _}, Successor, Next) ->
     {nil, Successor,Next};
 down(Ref, Predecessor, {_, Ref, _}, {Nkey, _, Npid}) ->
     io:format("successor die:~w~n",[Ref]),
-    self()! stabilize,
+    self() ! stabilize,
     %the next node becomes the successor
     Nref = monitor(Npid),
     {Predecessor, {Nkey, Nref, Npid}, nil}.
